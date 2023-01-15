@@ -40,8 +40,8 @@ const App = (params) => {
   }
 
   const handleClick = () => {
-    createTask()
-  }
+    dispatch(createTask("Новая задача", false));
+  };
   return (
     <>
       <h1>App</h1>

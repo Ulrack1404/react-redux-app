@@ -32,17 +32,40 @@ const taskSlice = createSlice({
     taskRequestedFailed(state, action) {
       state.isLoading = false;
     },
+    taskCreate(state, action) {
+      state.entities.push(action.payload);
+      state.isLoading = false;
+    },
   },
 });
 
 const { actions, reducer: taskReducer } = taskSlice;
-const { update, remove, recived, taskRequested, taskRequestedFailed } = actions;
+const {
+  update,
+  remove,
+  recived,
+  taskRequested,
+  taskRequestedFailed,
+  taskCreate,
+} = actions;
 
 export const loadTasks = () => async (dispatch) => {
   dispatch(taskRequested());
   try {
     const data = await todosService.fetch();
     dispatch(recived(data));
+  } catch (error) {
+    dispatch(taskRequestedFailed());
+    dispatch(setError(error.message));
+  }
+};
+
+export const createTask = (title, completed) => async (dispatch) => {
+  dispatch(taskRequested());
+  try {
+    const data = await todosService.post(title, completed);
+    console.log("data:", data);
+    dispatch(taskCreate(data));
   } catch (error) {
     dispatch(taskRequestedFailed());
     dispatch(setError(error.message));
@@ -64,9 +87,5 @@ export function taskDeleted(id) {
 export const getTasks = () => (state) => state.tasks.entities;
 export const getTasksLoadingStatus = () => (state) => state.tasks.isLoading;
 export const getError = () => (state) => state.errors.entities[0];
-
-export const createTask = () => {
-  console.log();
-};
 
 export default taskReducer;
